@@ -1,0 +1,2637 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการข้อมูลรถบริษัท HQ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Mitr', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #F5EFE6 0%, #E8DFCA 50%, #CBDCEB 100%);
+            min-height: 100%;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #6D94C5;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(25, 24, 59, 0.15);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 500px;
+            padding: 15px 20px;
+            border: 2px solid #6D94C5;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-family: 'Mitr', sans-serif;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #CBDCEB;
+            box-shadow: 0 0 10px rgba(109, 148, 197, 0.3);
+        }
+
+        .search-btn, .all-cars-btn {
+            background: linear-gradient(135deg, #6D94C5, #CBDCEB);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-family: 'Mitr', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(109, 148, 197, 0.3);
+        }
+
+        .search-btn:hover, .all-cars-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(109, 148, 197, 0.4);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-weight: 500;
+            margin-top: 15px;
+            padding: 10px;
+            background: #ffeaea;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .data-section {
+            display: none;
+        }
+
+        .back-btn, .refresh-btn, .detail-btn, .zoom-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-family: 'Mitr', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 3;
+            margin: 0 5px;
+        }
+
+        .back-btn:hover, .refresh-btn:hover, .detail-btn:hover, .zoom-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .refresh-btn {
+            background: rgba(46, 204, 113, 0.8);
+            border-color: rgba(46, 204, 113, 0.9);
+        }
+
+        .refresh-btn:hover {
+            background: rgba(39, 174, 96, 0.9);
+            border-color: rgba(39, 174, 96, 1);
+        }
+
+        .detail-btn {
+            background: rgba(52, 152, 219, 0.8);
+            border-color: rgba(52, 152, 219, 0.9);
+        }
+
+        .detail-btn:hover {
+            background: rgba(41, 128, 185, 0.9);
+            border-color: rgba(41, 128, 185, 1);
+        }
+
+        .data-title {
+            color: white;
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin: 0;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 3;
+        }
+
+        .data-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            font-weight: 400;
+            margin: 5px 0 0 0;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+        }
+
+        .header-icon {
+            font-size: 2.5rem;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(25, 24, 59, 0.15);
+            overflow-x: auto;
+        }
+
+        .table-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #6D94C5;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: linear-gradient(135deg, #6D94C5, #CBDCEB);
+            color: white;
+            padding: 15px 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            box-shadow: 0 2px 8px rgba(109, 148, 197, 0.2);
+            position: relative;
+        }
+
+        th:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        th:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
+        th div {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        th span:first-child {
+            font-size: 1.1rem;
+        }
+
+        td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f0f8ff;
+        }
+
+        .status-overdue {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+        }
+
+        .status-due {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+        }
+
+        .status-urgent {
+            background: linear-gradient(135deg, #ff9800, #ff5722);
+            color: white;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+        }
+
+        .status-action {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            color: white;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+        }
+
+        .status-safe {
+            background: linear-gradient(135deg, #4caf50, #388e3c);
+            color: white;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .data-header {
+            background: linear-gradient(135deg, #6D94C5 0%, #CBDCEB 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(109, 148, 197, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .data-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+
+        .header-content {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 20px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-center {
+            text-align: center;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .category-section {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(25, 24, 59, 0.15);
+            text-align: center;
+            border: 1px solid rgba(25, 24, 59, 0.1);
+        }
+
+        .category-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #6D94C5;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .category-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            background: linear-gradient(135deg, #6D94C5, #CBDCEB);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-family: 'Mitr', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(109, 148, 197, 0.3);
+            min-width: 250px;
+        }
+
+        .category-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(109, 148, 197, 0.4);
+            background: linear-gradient(135deg, #5a7fb0, #b8cde0);
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(25, 24, 59, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            font-weight: 500;
+            color: #6D94C5;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .filter-group select {
+            padding: 10px 15px;
+            border: 2px solid #6D94C5;
+            border-radius: 10px;
+            font-family: 'Mitr', sans-serif;
+            font-size: 0.95rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: #CBDCEB;
+            box-shadow: 0 0 8px rgba(109, 148, 197, 0.3);
+        }
+
+        .clear-filter-btn {
+            background: linear-gradient(135deg, #CBDCEB, #E8DFCA);
+            color: #6D94C5;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-family: 'Mitr', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: fit-content;
+        }
+
+        .clear-filter-btn:hover {
+            background: linear-gradient(135deg, #6D94C5, #CBDCEB);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .stats-section {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .vehicle-type-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #6D94C5 0%, #CBDCEB 50%, #E8DFCA 100%);
+            border-radius: 25px;
+            padding: 30px 40px;
+            box-shadow: 0 15px 35px rgba(109, 148, 197, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+            min-width: 280px;
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 45px rgba(109, 148, 197, 0.4);
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            animation: shimmer 4s ease-in-out infinite;
+        }
+
+        .stats-icon {
+            font-size: 4rem;
+            filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.2));
+            z-index: 2;
+            position: relative;
+        }
+
+        .stats-content {
+            z-index: 2;
+            position: relative;
+            text-align: center;
+        }
+
+        .vehicle-type-card {
+            background: linear-gradient(135deg, #F5EFE6 0%, #E8DFCA 50%, #CBDCEB 100%);
+            border-radius: 20px;
+            padding: 25px 30px;
+            box-shadow: 0 10px 25px rgba(109, 148, 197, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(109, 148, 197, 0.1);
+        }
+
+        .vehicle-type-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(109, 148, 197, 0.3);
+            border-color: rgba(109, 148, 197, 0.3);
+        }
+
+        .vehicle-type-icon {
+            font-size: 2.5rem;
+            filter: drop-shadow(1px 1px 4px rgba(0,0,0,0.1));
+        }
+
+        .vehicle-type-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #6D94C5;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            line-height: 1;
+            font-family: 'Mitr', sans-serif;
+        }
+
+        .vehicle-type-label {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #6D94C5;
+            font-family: 'Mitr', sans-serif;
+        }
+
+        .stats-number {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+            line-height: 1;
+            margin-bottom: 8px;
+            font-family: 'Mitr', sans-serif;
+            letter-spacing: -2px;
+        }
+
+        .stats-label {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+            font-family: 'Mitr', sans-serif;
+        }
+
+        .stats-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            font-weight: 500;
+            z-index: 3;
+            background: rgba(109, 148, 197, 0.9);
+            padding: 15px 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-summary-section {
+            background: linear-gradient(135deg, #F5EFE6 0%, #E8DFCA 50%, #CBDCEB 100%);
+            border-radius: 25px;
+            padding: 40px;
+            margin-top: 40px;
+            box-shadow: 0 15px 40px rgba(109, 148, 197, 0.2);
+            border: 2px solid rgba(109, 148, 197, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-summary-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(87, 142, 126, 0.05) 0%, transparent 70%);
+            animation: shimmer 6s ease-in-out infinite;
+        }
+
+        .status-summary-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #6D94C5;
+            margin-bottom: 10px;
+            text-align: center;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .status-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .status-summary-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 236, 213, 0.9) 100%);
+            border-radius: 20px;
+            padding: 30px 25px;
+            box-shadow: 0 10px 30px rgba(61, 61, 61, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 18px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .status-summary-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(61, 61, 61, 0.25);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .status-summary-number {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #2c3e50;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+            line-height: 1;
+            font-family: 'Mitr', sans-serif;
+            position: relative;
+            z-index: 2;
+            transition: color 0.3s ease;
+        }
+
+        .status-summary-label {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #34495e;
+            font-family: 'Mitr', sans-serif;
+            position: relative;
+            z-index: 2;
+            transition: color 0.3s ease;
+        }
+
+        .status-summary-card.overdue .status-summary-number {
+            color: #c53030;
+        }
+
+        .status-summary-card.due .status-summary-number {
+            color: #c2410c;
+        }
+
+        .status-summary-card.urgent .status-summary-number {
+            color: #d97706;
+        }
+
+        .status-summary-card.action .status-summary-number {
+            color: #2563eb;
+        }
+
+        .status-summary-card.safe .status-summary-number {
+            color: #16a34a;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #6D94C5;
+            font-style: italic;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6D94C5;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-card {
+                min-width: 260px;
+                padding: 25px 30px;
+                gap: 15px;
+            }
+
+            .vehicle-type-card {
+                min-width: 240px;
+                padding: 20px 25px;
+                gap: 10px;
+            }
+
+            .vehicle-type-stats {
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: 15px;
+            }
+            
+            .stats-icon {
+                font-size: 3rem;
+            }
+            
+            .stats-number {
+                font-size: 2.8rem;
+            }
+            
+            .stats-label {
+                font-size: 1.1rem;
+            }
+            
+            .search-section {
+                padding: 20px;
+            }
+            
+            .data-header {
+                padding: 20px;
+            }
+            
+            .header-content {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .header-left, .header-right {
+                justify-content: center;
+            }
+            
+            .data-title {
+                font-size: 1.8rem;
+            }
+            
+            .header-icon {
+                font-size: 2rem;
+            }
+            
+            .category-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .category-btn {
+                min-width: 200px;
+                padding: 12px 25px;
+            }
+            
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                min-width: auto;
+                width: 100%;
+            }
+            
+            table {
+                font-size: 0.8rem;
+            }
+            
+            th, td {
+                padding: 8px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- หน้าที่ 1: หน้าค้นหา -->
+        <div id="searchPage">
+            <div class="header">
+                <h1>ข้อมูลรถบริษัท HQ</h1>
+            </div>
+
+            <div class="search-section">
+                <input type="text" id="searchInput" class="search-box" placeholder="ค้นหาด้วย ทะเบียนรถ, ผู้รับผิดชอบ, หรือสาขาที่รับผิดชอบ">
+                <br>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="searchData()" class="search-btn">🔍 ค้นหา</button>
+                    <button onclick="showAllCars()" class="all-cars-btn">🚙 รถบริษัททั้งหมด</button>
+                </div>
+                <div id="errorMessage" class="error-message">กรอกข้อมูลไม่ถูกต้อง</div>
+            </div>
+
+            <!-- กรอบแสดงสถิติรถ -->
+            <div class="stats-section">
+                <div class="stats-grid">
+                    <!-- จำนวนรถทั้งหมด -->
+                    <div class="stats-card">
+                        <div class="stats-content">
+                            <div class="stats-number" id="totalCarsCount">-</div>
+                            <div class="stats-label">จำนวนรถทั้งหมด</div>
+                        </div>
+                        <div class="stats-loading" id="statsLoading">
+                            <div class="loading-spinner"></div>
+                            <span>กำลังโหลด...</span>
+                        </div>
+                    </div>
+
+                    <!-- สถิติประเภทรถ -->
+                    <div id="vehicleTypeStats" class="vehicle-type-stats">
+                        <!-- จะถูกเพิ่มด้วย JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Summary Section -->
+            <div class="status-summary-section">
+                <div class="status-summary-title">📊 สรุปสถานะรถทั้งหมด</div>
+                <div class="status-summary-grid" id="statusSummaryGrid">
+                    <!-- จะถูกเพิ่มด้วย JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าที่ 2: หน้าแสดงข้อมูลแบบย่อ -->
+        <div id="dataPage" class="data-section">
+            <!-- Header Section -->
+            <div class="data-header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <button onclick="goBack()" class="back-btn">← ย้อนกลับ</button>
+                    </div>
+                    <div class="header-center">
+                        <h2 class="data-title">📋 รายการข้อมูลรถบริษัท</h2>
+                        <p class="data-subtitle">ข้อมูลรถบริษัท HQ ล่าสุด</p>
+                    </div>
+                    <div class="header-right">
+                        <button onclick="refreshData()" class="refresh-btn">🔄 รีเฟสข้อมูล</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Category Section -->
+            <div class="category-section">
+                <div class="category-buttons">
+                    <button onclick="showDetailedView()" class="category-btn">⏰ แสดงระยะเวลา</button>
+                    <button onclick="showNotificationPage()" class="category-btn">🔧 การตรวจสภาพรถ</button>
+                    <button onclick="showNotesPage()" class="category-btn">📝 หมายเหตุ</button>
+                </div>
+            </div>
+            
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="responsibleFilter">ผู้รับผิดชอบ:</label>
+                    <select id="responsibleFilter" onchange="applyFilters()">
+                        <option value="">-- ทั้งหมด --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="branchFilter">สาขาที่รับผิดชอบ:</label>
+                    <select id="branchFilter" onchange="applyFilters()">
+                        <option value="">-- ทั้งหมด --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="vehicleTypeFilter">ประเภทรถ:</label>
+                    <select id="vehicleTypeFilter" onchange="applyFilters()">
+                        <option value="">-- ทั้งหมด --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button onclick="clearFilters()" class="clear-filter-btn">ล้างตัวกรอง</button>
+                </div>
+            </div>
+            
+            <!-- Loading and Data Section -->
+            <div id="loadingMessage" class="loading">กำลังโหลดข้อมูลล่าสุด... 🔄</div>
+            <div id="tableContainer" class="table-container" style="display: none;">
+                <div class="table-title">📊 รายการข้อมูลรถบริษัท HQ</div>
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">🔢 ลำดับ</th>
+                            <th>🚗 ทะเบียนรถ</th>
+                            <th>👤 ผู้รับผิดชอบ</th>
+                            <th>🏢 สาขาที่รับผิดชอบ</th>
+                            <th>💰 วันที่ภาษี</th>
+                            <th>🛡️ วันที่ พรบ.</th>
+                            <th>🏥 วันที่ประกัน</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- หน้าที่ 3: หน้าแสดงระยะเวลา -->
+        <div id="detailedPage" class="data-section">
+            <!-- Header Section -->
+            <div class="data-header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <button onclick="goBackToData()" class="back-btn">← ย้อนกลับ</button>
+                    </div>
+                    <div class="header-center">
+                        <h2 class="data-title">⏰ แสดงระยะเวลา</h2>
+                        <p class="data-subtitle">ข้อมูลระยะเวลาคงเหลือของเอกสารรถบริษัท</p>
+                    </div>
+                    <div class="header-right">
+                        <button onclick="refreshDetailedData()" class="refresh-btn">🔄 รีเฟสข้อมูล</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="detailedResponsibleFilter">ผู้รับผิดชอบ:</label>
+                    <select id="detailedResponsibleFilter" onchange="applyDetailedFilters()">
+                        <option value="">-- ทั้งหมด --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="detailedBranchFilter">สาขาที่รับผิดชอบ:</label>
+                    <select id="detailedBranchFilter" onchange="applyDetailedFilters()">
+                        <option value="">-- ทั้งหมด --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="detailedStatusFilter">สถานะ:</label>
+                    <select id="detailedStatusFilter" onchange="applyDetailedFilters()">
+                        <option value="">-- ทั้งหมด --</option>
+                        <option value="overdue">เกินกำหนดการ</option>
+                        <option value="due">ครบกำหนดการ</option>
+                        <option value="urgent">เร่งดำเนินการ</option>
+                        <option value="action">ระยะดำเนินการ</option>
+                        <option value="safe">ยังไม่ถึงกำหนดการ</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button onclick="clearDetailedFilters()" class="clear-filter-btn">ล้างตัวกรอง</button>
+                </div>
+            </div>
+            
+            <!-- Loading and Data Section -->
+            <div id="detailedLoadingMessage" class="loading">กำลังโหลดข้อมูล... 🔄</div>
+            <div id="detailedTableContainer" class="table-container" style="display: none;">
+                <table id="detailedDataTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ลำดับ</th>
+                            <th>ทะเบียนรถ</th>
+                            <th>ผู้รับผิดชอบ</th>
+                            <th>สาขา</th>
+                            <th>ภาษี (วัน)</th>
+                            <th>พรบ. (วัน)</th>
+                            <th>ประกัน (วัน)</th>
+                            <th>สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailedDataBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- หน้าที่ 4: หน้าการตรวจสภาพรถ -->
+        <div id="notificationPage" class="data-section">
+            <!-- Header Section -->
+            <div class="data-header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <button onclick="goBackToData()" class="back-btn">← ย้อนกลับ</button>
+                    </div>
+                    <div class="header-center">
+                        <h2 class="data-title">🔧 การตรวจสภาพรถ</h2>
+                        <p class="data-subtitle">ข้อมูลการตรวจสภาพรถและใบอนุญาต</p>
+                    </div>
+                    <div class="header-right">
+                        <button onclick="refreshNotificationData()" class="refresh-btn">🔄 รีเฟสข้อมูล</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="notificationResponsibleFilter">ผู้รับผิดชอบ:</label>
+                    <select id="notificationResponsibleFilter" onchange="applyNotificationFilters()">
+                        <option value="">-- ทั้งหมด --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="notificationBranchFilter">สาขาที่รับผิดชอบ:</label>
+                    <select id="notificationBranchFilter" onchange="applyNotificationFilters()">
+                        <option value="">-- ทั้งหมด --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="notificationInspectionFilter">การตรวจสภาพ:</label>
+                    <select id="notificationInspectionFilter" onchange="applyNotificationFilters()">
+                        <option value="">-- ทั้งหมด --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button onclick="clearNotificationFilters()" class="clear-filter-btn">ล้างตัวกรอง</button>
+                </div>
+            </div>
+            
+            <!-- Loading and Data Section -->
+            <div id="notificationLoadingMessage" class="loading">กำลังโหลดข้อมูล... 🔄</div>
+            <div id="notificationTableContainer" class="table-container" style="display: none;">
+                <table id="notificationDataTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ลำดับ</th>
+                            <th>ทะเบียนรถ</th>
+                            <th>ผู้รับผิดชอบ</th>
+                            <th>สาขาที่รับผิดชอบ</th>
+                            <th>การตรวจสภาพรถ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notificationDataBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- หน้าที่ 5: หน้าหมายเหตุ -->
+        <div id="notesPage" class="data-section">
+            <!-- Header Section -->
+            <div class="data-header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <button onclick="goBackToData()" class="back-btn">← ย้อนกลับ</button>
+                    </div>
+                    <div class="header-center">
+                        <h2 class="data-title">📝 หมายเหตุ</h2>
+                        <p class="data-subtitle">หมายเหตุและข้อมูลเพิ่มเติมของรถบริษัท</p>
+                    </div>
+                    <div class="header-right">
+                        <button onclick="refreshNotesData()" class="refresh-btn">🔄 รีเฟสข้อมูล</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="notesBranchFilter">สาขา:</label>
+                    <select id="notesBranchFilter" onchange="applyNotesFilters()">
+                        <option value="">-- ทั้งหมด --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button onclick="clearNotesFilters()" class="clear-filter-btn">ล้างตัวกรอง</button>
+                </div>
+            </div>
+            
+            <!-- Loading and Data Section -->
+            <div id="notesLoadingMessage" class="loading">กำลังโหลดข้อมูล... 🔄</div>
+            <div id="notesTableContainer" class="table-container" style="display: none;">
+                <table id="notesDataTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ลำดับ</th>
+                            <th>ทะเบียนรถ</th>
+                            <th>สาขา</th>
+                            <th style="width: 40%;">หมายเหตุ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notesDataBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            สำหรับใช้เพียงเพื่อดูรายละเอียดของรถบริษัทเท่านั้น
+        </div>
+    </div>
+
+    <script>
+        let allData = [];
+        let currentSearchTerm = '';
+
+        // ฟังก์ชันสำหรับดึงข้อมูลจาก Google Sheets โดยตรง
+        function fetchData(callback) {
+            const SHEET_ID = '1adqv1wrKsbF3H6quTD3BU4Ja4-afJrDxO4EX-WmImaI';
+            
+            // ใช้ CSV export URL ที่เสถียรกว่า
+            const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+            
+            console.log('กำลังเชื่อมต่อ Google Sheets...');
+            console.log('Sheet ID:', SHEET_ID);
+            console.log('CSV URL:', CSV_URL);
+            
+            fetch(CSV_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(csvText => {
+                    console.log('ได้รับข้อมูล CSV:', csvText.substring(0, 500) + '...');
+                    
+                    // แปลง CSV เป็น array
+                    const lines = csvText.split('\n');
+                    const data = [];
+                    
+                    for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (line) {
+                            // แยกข้อมูลด้วย comma แต่คำนึงถึง quotes
+                            const row = parseCSVLine(line);
+                            if (row.length > 0) {
+                                data.push(row);
+                            }
+                        }
+                    }
+                    
+                    // ลบ header row (แถวแรก)
+                    const dataWithoutHeader = data.slice(1);
+                    
+                    // กรองแถวที่มีข้อมูลจริง
+                    const validData = dataWithoutHeader.filter(row => 
+                        row.length > 1 && row[1] && row[1].toString().trim() !== ''
+                    );
+                    
+                    console.log('จำนวนข้อมูลที่ได้รับ:', validData.length, 'แถว');
+                    console.log('ตัวอย่างข้อมูล:', validData.slice(0, 3));
+                    
+                    callback({
+                        success: true,
+                        data: validData,
+                        message: 'เชื่อมต่อ Google Sheets สำเร็จ',
+                        totalRows: validData.length
+                    });
+                })
+                .catch(error => {
+                    console.error('เกิดข้อผิดพลาดในการดึงข้อมูล:', error);
+                    callback({
+                        success: false,
+                        data: [],
+                        message: 'ไม่สามารถเชื่อมต่อ Google Sheets ได้',
+                        error: error.message
+                    });
+                });
+        }
+
+        // ฟังก์ชันสำหรับแปลง CSV line เป็น array
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            result.push(current.trim());
+            return result;
+        }
+
+        // ฟังก์ชันสำหรับทำความสะอาดข้อมูลวันที่
+        function cleanDateData(cellData) {
+            if (!cellData) return '';
+            
+            let cleanData = cellData.toString();
+            cleanData = cleanData.replace(/T\d{2}:\d{2}:\d{2}\.\d{3}Z/g, '');
+            
+            return cleanData;
+        }
+
+        // ฟังก์ชันสำหรับคำนวณสถานะจากระยะเวลา
+        function calculateStatus(taxPeriod, prbPeriod, insurancePeriod) {
+            // แปลงข้อมูลเป็นตัวเลข โดยดึงเฉพาะตัวเลขและเครื่องหมายลบ
+            const taxDays = parseFloat((taxPeriod || '').toString().replace(/[^\d.-]/g, '')) || 0;
+            const prbDays = parseFloat((prbPeriod || '').toString().replace(/[^\d.-]/g, '')) || 0;
+            const insuranceDays = parseFloat((insurancePeriod || '').toString().replace(/[^\d.-]/g, '')) || 0;
+            
+            // หาค่าที่น้อยที่สุดจากทั้ง 3 ค่า
+            const minDays = Math.min(taxDays, prbDays, insuranceDays);
+            
+            if (minDays < 0) {
+                return {
+                    text: 'เกินกำหนดการ',
+                    class: 'status-overdue',
+                    color: '#e74c3c'
+                };
+            } else if (minDays === 0) {
+                return {
+                    text: 'ครบกำหนดการ',
+                    class: 'status-due',
+                    color: '#f39c12'
+                };
+            } else if (minDays <= 30) {
+                return {
+                    text: 'เร่งดำเนินการ',
+                    class: 'status-urgent',
+                    color: '#ff9800'
+                };
+            } else if (minDays <= 90) {
+                return {
+                    text: 'ระยะดำเนินการ',
+                    class: 'status-action',
+                    color: '#2196f3'
+                };
+            } else {
+                return {
+                    text: 'ยังไม่ถึงกำหนดการ',
+                    class: 'status-safe',
+                    color: '#4caf50'
+                };
+            }
+        }
+
+        // ฟังก์ชันสำหรับสร้าง dropdown options
+        function populateFilters(data) {
+            const responsibleFilter = document.getElementById('responsibleFilter');
+            const branchFilter = document.getElementById('branchFilter');
+            const vehicleTypeFilter = document.getElementById('vehicleTypeFilter');
+            
+            if (!responsibleFilter || !branchFilter || !vehicleTypeFilter) return;
+            
+            responsibleFilter.innerHTML = '<option value="">-- ทั้งหมด --</option>';
+            branchFilter.innerHTML = '<option value="">-- ทั้งหมด --</option>';
+            vehicleTypeFilter.innerHTML = '<option value="">-- ทั้งหมด --</option>';
+            
+            const responsibleSet = new Set();
+            const branchSet = new Set();
+            const vehicleTypeSet = new Set();
+            
+            data.forEach(row => {
+                const vehicleType = (row[0] || '').toString().trim();
+                const responsible = (row[2] || '').toString().trim();
+                const branch = (row[3] || '').toString().trim();
+                
+                if (vehicleType) vehicleTypeSet.add(vehicleType);
+                if (responsible) responsibleSet.add(responsible);
+                if (branch) branchSet.add(branch);
+            });
+            
+            Array.from(responsibleSet).sort().forEach(responsible => {
+                const option = document.createElement('option');
+                option.value = responsible;
+                option.textContent = responsible;
+                responsibleFilter.appendChild(option);
+            });
+            
+            Array.from(branchSet).sort().forEach(branch => {
+                const option = document.createElement('option');
+                option.value = branch;
+                option.textContent = branch;
+                branchFilter.appendChild(option);
+            });
+            
+            Array.from(vehicleTypeSet).sort().forEach(vehicleType => {
+                const option = document.createElement('option');
+                option.value = vehicleType;
+                option.textContent = vehicleType;
+                vehicleTypeFilter.appendChild(option);
+            });
+        }
+
+        // ฟังก์ชันสำหรับสร้าง dropdown options สำหรับหน้าระยะเวลา
+        function populateDetailedFilters(data) {
+            const responsibleFilter = document.getElementById('detailedResponsibleFilter');
+            const branchFilter = document.getElementById('detailedBranchFilter');
+            
+            if (!responsibleFilter || !branchFilter) return;
+            
+            responsibleFilter.innerHTML = '<option value="">-- ทั้งหมด --</option>';
+            branchFilter.innerHTML = '<option value="">-- ทั้งหมด --</option>';
+            
+            const responsibleSet = new Set();
+            const branchSet = new Set();
+            
+            data.forEach(row => {
+                const responsible = (row[2] || '').toString().trim();
+                const branch = (row[3] || '').toString().trim();
+                
+                if (responsible) responsibleSet.add(responsible);
+                if (branch) branchSet.add(branch);
+            });
+            
+            Array.from(responsibleSet).sort().forEach(responsible => {
+                const option = document.createElement('option');
+                option.value = responsible;
+                option.textContent = responsible;
+                responsibleFilter.appendChild(option);
+            });
+            
+            Array.from(branchSet).sort().forEach(branch => {
+                const option = document.createElement('option');
+                option.value = branch;
+                option.textContent = branch;
+                branchFilter.appendChild(option);
+            });
+        }
+
+        // ฟังก์ชันสำหรับสร้าง dropdown options สำหรับหน้าการตรวจสภาพรถ
+        function populateNotificationFilters(data) {
+            const responsibleFilter = document.getElementById('notificationResponsibleFilter');
+            const branchFilter = document.getElementById('notificationBranchFilter');
+            const inspectionFilter = document.getElementById('notificationInspectionFilter');
+            
+            if (!responsibleFilter || !branchFilter || !inspectionFilter) return;
+            
+            responsibleFilter.innerHTML = '<option value="">-- ทั้งหมด --</option>';
+            branchFilter.innerHTML = '<option value="">-- ทั้งหมด --</option>';
+            inspectionFilter.innerHTML = '<option value="">-- ทั้งหมด --</option>';
+            
+            const responsibleSet = new Set();
+            const branchSet = new Set();
+            const inspectionSet = new Set();
+            
+            data.forEach(row => {
+                const responsible = (row[2] || '').toString().trim();
+                const branch = (row[3] || '').toString().trim();
+                const inspection = (row[4] || '').toString().trim();
+                
+                if (responsible) responsibleSet.add(responsible);
+                if (branch) branchSet.add(branch);
+                if (inspection) inspectionSet.add(inspection);
+            });
+            
+            Array.from(responsibleSet).sort().forEach(responsible => {
+                const option = document.createElement('option');
+                option.value = responsible;
+                option.textContent = responsible;
+                responsibleFilter.appendChild(option);
+            });
+            
+            Array.from(branchSet).sort().forEach(branch => {
+                const option = document.createElement('option');
+                option.value = branch;
+                option.textContent = branch;
+                branchFilter.appendChild(option);
+            });
+            
+            Array.from(inspectionSet).sort().forEach(inspection => {
+                const option = document.createElement('option');
+                option.value = inspection;
+                option.textContent = inspection;
+                inspectionFilter.appendChild(option);
+            });
+        }
+
+        // ฟังก์ชันสำหรับสร้าง dropdown options สำหรับหน้าหมายเหตุ
+        function populateNotesFilters(data) {
+            const branchFilter = document.getElementById('notesBranchFilter');
+            
+            if (!branchFilter) return;
+            
+            branchFilter.innerHTML = '<option value="">-- ทั้งหมด --</option>';
+            
+            const branchSet = new Set();
+            
+            data.forEach(row => {
+                const branch = (row[3] || '').toString().trim();
+                if (branch) branchSet.add(branch);
+            });
+            
+            Array.from(branchSet).sort().forEach(branch => {
+                const option = document.createElement('option');
+                option.value = branch;
+                option.textContent = branch;
+                branchFilter.appendChild(option);
+            });
+        }
+
+        // ฟังก์ชันสำหรับใช้ filter
+        function applyFilters() {
+            const responsibleFilter = document.getElementById('responsibleFilter');
+            const branchFilter = document.getElementById('branchFilter');
+            const vehicleTypeFilter = document.getElementById('vehicleTypeFilter');
+            
+            if (!responsibleFilter || !branchFilter || !vehicleTypeFilter) return;
+            
+            const responsibleValue = responsibleFilter.value;
+            const branchValue = branchFilter.value;
+            const vehicleTypeValue = vehicleTypeFilter.value;
+            
+            let filteredData = allData;
+            
+            if (responsibleValue) {
+                filteredData = filteredData.filter(row => 
+                    (row[2] || '').toString().trim() === responsibleValue
+                );
+            }
+            
+            if (branchValue) {
+                filteredData = filteredData.filter(row => 
+                    (row[3] || '').toString().trim() === branchValue
+                );
+            }
+            
+            if (vehicleTypeValue) {
+                filteredData = filteredData.filter(row => 
+                    (row[0] || '').toString().trim() === vehicleTypeValue
+                );
+            }
+            
+            if (currentSearchTerm) {
+                filteredData = filteredData.filter(row => {
+                    const search = currentSearchTerm.toLowerCase().trim();
+                    
+                    return (row[1] || '').toString().toLowerCase().includes(search) ||
+                           (row[2] || '').toString().toLowerCase().includes(search) ||
+                           (row[3] || '').toString().toLowerCase().includes(search);
+                });
+            }
+            
+            displayFilteredData(filteredData);
+        }
+
+        // ฟังก์ชันล้างตัวกรอง
+        function clearFilters() {
+            const responsibleFilter = document.getElementById('responsibleFilter');
+            const branchFilter = document.getElementById('branchFilter');
+            const vehicleTypeFilter = document.getElementById('vehicleTypeFilter');
+            
+            if (responsibleFilter) responsibleFilter.value = '';
+            if (branchFilter) branchFilter.value = '';
+            if (vehicleTypeFilter) vehicleTypeFilter.value = '';
+            
+            if (currentSearchTerm) {
+                displayData(allData, currentSearchTerm);
+            } else {
+                displayData(allData, '');
+            }
+        }
+
+        // ฟังก์ชันสำหรับแสดงข้อมูลที่กรองแล้ว
+        function displayFilteredData(data) {
+            const tbody = document.getElementById('dataBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7">ไม่พบข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+                return;
+            }
+
+            data.forEach((row, index) => {
+                if (!row[1] || row[1].toString().trim() === '') {
+                    return;
+                }
+                
+                const tr = document.createElement('tr');
+                
+                const orderCell = document.createElement('td');
+                orderCell.textContent = index + 1;
+                tr.appendChild(orderCell);
+                
+                const plateCell = document.createElement('td');
+                const vehicleType = (row[0] || '').toString();
+                let vehicleIcon = '🚗';
+                
+                if (vehicleType.includes('จักยานยนต์')) {
+                    vehicleIcon = '🏍️';
+                } else if (vehicleType.includes('ส่วนบุคคล')) {
+                    vehicleIcon = '🚙';
+                } else if (vehicleType.includes('4 ล้อ') || vehicleType.includes('4ล้อ')) {
+                    vehicleIcon = '🚚';
+                } else if (vehicleType.includes('6 ล้อ') || vehicleType.includes('6ล้อ')) {
+                    vehicleIcon = '🚛';
+                } else if (vehicleType.includes('แทรกเตอร์')) {
+                    vehicleIcon = '🚜';
+                }
+                
+                plateCell.innerHTML = `${vehicleIcon} ${cleanDateData(row[1] || '')}`;
+                tr.appendChild(plateCell);
+                
+                const responsibleCell = document.createElement('td');
+                responsibleCell.textContent = cleanDateData(row[2] || '');
+                tr.appendChild(responsibleCell);
+                
+                const branchCell = document.createElement('td');
+                branchCell.textContent = cleanDateData(row[3] || '');
+                tr.appendChild(branchCell);
+                
+                const taxCell = document.createElement('td');
+                taxCell.textContent = cleanDateData(row[6] || '');
+                tr.appendChild(taxCell);
+                
+                const prbCell = document.createElement('td');
+                prbCell.textContent = cleanDateData(row[9] || '');
+                tr.appendChild(prbCell);
+                
+                const insuranceCell = document.createElement('td');
+                insuranceCell.textContent = cleanDateData(row[12] || '');
+                tr.appendChild(insuranceCell);
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ฟังก์ชันสำหรับแสดงข้อมูลในตาราง
+        function displayData(data, searchTerm = '') {
+            const tbody = document.getElementById('dataBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+
+            let filteredData = data;
+            
+            if (searchTerm) {
+                filteredData = data.filter(row => {
+                    const search = searchTerm.toLowerCase().trim();
+                    
+                    return (row[1] || '').toString().toLowerCase().includes(search) ||
+                           (row[2] || '').toString().toLowerCase().includes(search) ||
+                           (row[3] || '').toString().toLowerCase().includes(search);
+                });
+            }
+
+            filteredData = filteredData.filter(row => row[1] && row[1].toString().trim() !== '');
+
+            populateFilters(filteredData);
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7">ไม่พบข้อมูล${searchTerm ? ` สำหรับ "${searchTerm}"` : ''}</td></tr>`;
+                return;
+            }
+
+            filteredData.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                
+                const orderCell = document.createElement('td');
+                orderCell.textContent = index + 1;
+                tr.appendChild(orderCell);
+                
+                const plateCell = document.createElement('td');
+                const vehicleType = (row[0] || '').toString();
+                let vehicleIcon = '🚗';
+                
+                if (vehicleType.includes('จักยานยนต์')) {
+                    vehicleIcon = '🏍️';
+                } else if (vehicleType.includes('ส่วนบุคคล')) {
+                    vehicleIcon = '🚙';
+                } else if (vehicleType.includes('4 ล้อ') || vehicleType.includes('4ล้อ')) {
+                    vehicleIcon = '🚚';
+                } else if (vehicleType.includes('6 ล้อ') || vehicleType.includes('6ล้อ')) {
+                    vehicleIcon = '🚛';
+                } else if (vehicleType.includes('แทรกเตอร์')) {
+                    vehicleIcon = '🚜';
+                }
+                
+                plateCell.innerHTML = `${vehicleIcon} ${cleanDateData(row[1] || '')}`;
+                tr.appendChild(plateCell);
+                
+                const responsibleCell = document.createElement('td');
+                responsibleCell.textContent = cleanDateData(row[2] || '');
+                tr.appendChild(responsibleCell);
+                
+                const branchCell = document.createElement('td');
+                branchCell.textContent = cleanDateData(row[3] || '');
+                tr.appendChild(branchCell);
+                
+                const taxCell = document.createElement('td');
+                taxCell.textContent = cleanDateData(row[6] || '');
+                tr.appendChild(taxCell);
+                
+                const prbCell = document.createElement('td');
+                prbCell.textContent = cleanDateData(row[9] || '');
+                tr.appendChild(prbCell);
+                
+                const insuranceCell = document.createElement('td');
+                insuranceCell.textContent = cleanDateData(row[12] || '');
+                tr.appendChild(insuranceCell);
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ฟังก์ชันค้นหาข้อมูล
+        function searchData() {
+            const searchInput = document.getElementById('searchInput');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            if (!searchInput || !errorMessage) return;
+            
+            const searchTerm = searchInput.value.trim();
+            
+            if (!searchTerm) {
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            errorMessage.style.display = 'none';
+            currentSearchTerm = searchTerm;
+            
+            const searchPage = document.getElementById('searchPage');
+            const dataPage = document.getElementById('dataPage');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const tableContainer = document.getElementById('tableContainer');
+            
+            if (searchPage) searchPage.style.display = 'none';
+            if (dataPage) dataPage.style.display = 'block';
+            if (loadingMessage) {
+                loadingMessage.style.display = 'block';
+                loadingMessage.innerHTML = 'กำลังโหลดข้อมูลล่าสุด... 🔄';
+            }
+            if (tableContainer) tableContainer.style.display = 'none';
+            
+            fetchData(function(response) {
+                if (response && response.success && response.data && response.data.length > 0) {
+                    allData = response.data;
+                    
+                    const filteredData = allData.filter(row => {
+                        const search = searchTerm.toLowerCase().trim();
+                        
+                        return (row[1] || '').toString().toLowerCase().includes(search) ||
+                               (row[2] || '').toString().toLowerCase().includes(search) ||
+                               (row[3] || '').toString().toLowerCase().includes(search);
+                    });
+                    
+                    if (filteredData.length === 0) {
+                        if (loadingMessage) {
+                            loadingMessage.innerHTML = `ไม่พบข้อมูลที่ค้นหา "${searchTerm}"`;
+                        }
+                        return;
+                    }
+                    
+                    if (loadingMessage) loadingMessage.style.display = 'none';
+                    if (tableContainer) tableContainer.style.display = 'block';
+                    displayData(allData, searchTerm);
+                } else {
+                    if (loadingMessage) {
+                        loadingMessage.innerHTML = `
+                            <div style="color: #e74c3c; text-align: center; padding: 20px;">
+                                <div style="font-size: 1.2rem; margin-bottom: 10px;">⚠️ ไม่สามารถโหลดข้อมูลได้</div>
+                                <div style="font-size: 0.9rem; color: #7f8c8d;">
+                                    ${response.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheet'}
+                                </div>
+                                ${response.error ? `<div style="font-size: 0.8rem; color: #95a5a6; margin-top: 5px;">${response.error}</div>` : ''}
+                            </div>
+                        `;
+                    }
+                }
+            });
+        }
+
+        // ฟังก์ชันแสดงรถทั้งหมด
+        function showAllCars() {
+            currentSearchTerm = '';
+            
+            const searchPage = document.getElementById('searchPage');
+            const dataPage = document.getElementById('dataPage');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const tableContainer = document.getElementById('tableContainer');
+            
+            if (searchPage) searchPage.style.display = 'none';
+            if (dataPage) dataPage.style.display = 'block';
+            if (loadingMessage) {
+                loadingMessage.style.display = 'block';
+                loadingMessage.innerHTML = 'กำลังโหลดข้อมูลล่าสุด... 🔄';
+            }
+            if (tableContainer) tableContainer.style.display = 'none';
+            
+            fetchData(function(response) {
+                if (response && response.success && response.data && response.data.length > 0) {
+                    allData = response.data;
+                    if (loadingMessage) loadingMessage.style.display = 'none';
+                    if (tableContainer) tableContainer.style.display = 'block';
+                    displayData(allData, '');
+                } else {
+                    if (loadingMessage) {
+                        loadingMessage.innerHTML = `
+                            <div style="color: #e74c3c; text-align: center; padding: 20px;">
+                                <div style="font-size: 1.2rem; margin-bottom: 10px;">⚠️ ไม่สามารถโหลดข้อมูลได้</div>
+                                <div style="font-size: 0.9rem; color: #7f8c8d;">
+                                    ${response.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheet'}
+                                </div>
+                                ${response.error ? `<div style="font-size: 0.8rem; color: #95a5a6; margin-top: 5px;">${response.error}</div>` : ''}
+                            </div>
+                        `;
+                    }
+                }
+            });
+        }
+
+        // ฟังก์ชันรีเฟสข้อมูล
+        function refreshData() {
+            const loadingMessage = document.getElementById('loadingMessage');
+            const tableContainer = document.getElementById('tableContainer');
+            
+            if (loadingMessage) {
+                loadingMessage.style.display = 'block';
+                loadingMessage.innerHTML = 'กำลังรีเฟสข้อมูลล่าสุด... 🔄';
+            }
+            if (tableContainer) tableContainer.style.display = 'none';
+            
+            fetchData(function(response) {
+                if (response && response.success && response.data) {
+                    allData = response.data;
+                    if (loadingMessage) loadingMessage.style.display = 'none';
+                    if (tableContainer) tableContainer.style.display = 'block';
+                    
+                    if (currentSearchTerm) {
+                        displayData(allData, currentSearchTerm);
+                    } else {
+                        displayData(allData, '');
+                    }
+                    
+                    const dataTitle = document.querySelector('.data-title');
+                    if (dataTitle) {
+                        const originalTitle = dataTitle.textContent;
+                        dataTitle.textContent = 'รีเฟสข้อมูลสำเร็จ! ✅';
+                        dataTitle.style.color = '#27ae60';
+                        
+                        setTimeout(() => {
+                            dataTitle.textContent = originalTitle;
+                            dataTitle.style.color = 'white';
+                        }, 2000);
+                    }
+                } else {
+                    if (loadingMessage) {
+                        loadingMessage.innerHTML = `
+                            <div style="color: #e74c3c; text-align: center; padding: 20px;">
+                                <div style="font-size: 1.2rem; margin-bottom: 10px;">⚠️ ไม่สามารถรีเฟสข้อมูลได้</div>
+                                <div style="font-size: 0.9rem; color: #7f8c8d;">
+                                    ${response.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheet'}
+                                </div>
+                                ${response.error ? `<div style="font-size: 0.8rem; color: #95a5a6; margin-top: 5px;">${response.error}</div>` : ''}
+                            </div>
+                        `;
+                    }
+                }
+            });
+        }
+
+        // ฟังก์ชันย้อนกลับ
+        function goBack() {
+            const searchPage = document.getElementById('searchPage');
+            const dataPage = document.getElementById('dataPage');
+            
+            if (searchPage) searchPage.style.display = 'block';
+            if (dataPage) dataPage.style.display = 'none';
+        }
+
+        // ฟังก์ชันแอนิเมชันตัวเลข
+        function animateNumber(element, start, end, duration) {
+            if (!element) return;
+            
+            const startTime = performance.now();
+            const difference = end - start;
+            
+            function updateNumber(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                const current = Math.round(start + (difference * easeOutQuart));
+                
+                element.textContent = current.toLocaleString();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateNumber);
+                }
+            }
+            
+            requestAnimationFrame(updateNumber);
+        }
+
+        // ฟังก์ชันโหลดและแสดงสถิติ
+        function loadAndDisplayStats() {
+            const statsLoading = document.getElementById('statsLoading');
+            const totalCarsElement = document.getElementById('totalCarsCount');
+            const vehicleTypeStatsContainer = document.getElementById('vehicleTypeStats');
+            const statusSummaryGrid = document.getElementById('statusSummaryGrid');
+            
+            if (statsLoading) {
+                statsLoading.style.display = 'flex';
+            }
+            
+            fetchData(function(response) {
+                if (response && response.success && response.data && response.data.length > 0) {
+                    const data = response.data;
+                    
+                    const validData = data.filter(row => row[1] && row[1].toString().trim() !== '');
+                    
+                    if (statsLoading) {
+                        statsLoading.style.display = 'none';
+                    }
+                    
+                    if (totalCarsElement) {
+                        animateNumber(totalCarsElement, 0, validData.length, 1000);
+                    }
+                    
+                    const vehicleTypeCounts = {};
+                    validData.forEach(row => {
+                        const vehicleType = (row[0] || '').toString().trim();
+                        if (vehicleType) {
+                            vehicleTypeCounts[vehicleType] = (vehicleTypeCounts[vehicleType] || 0) + 1;
+                        }
+                    });
+                    
+                    if (vehicleTypeStatsContainer && Object.keys(vehicleTypeCounts).length > 0) {
+                        vehicleTypeStatsContainer.innerHTML = '';
+                        
+                        const vehicleTypeOrder = [
+                            'รถจักยานยนต์',
+                            'รถยนต์ส่วนบุคคล', 
+                            'รถส่วนบุคคล',
+                            'รถบรรทุก ( 4 ล้อ )',
+                            'รถ 4 ล้อ',
+                            'รถบรรทุก ( 6 ล้อ )',
+                            'รถ 6 ล้อ',
+                            'รถแทรกเตอร์'
+                        ];
+                        
+                        const sortedVehicleTypes = Object.entries(vehicleTypeCounts).sort(([typeA], [typeB]) => {
+                            const indexA = vehicleTypeOrder.findIndex(orderType => 
+                                typeA.includes(orderType.replace(/รถบรรทุก \( | \)/g, '').replace('รถยนต์', '')) ||
+                                orderType.includes(typeA.replace(/รถบรรทุก \( | \)/g, '').replace('รถยนต์', ''))
+                            );
+                            const indexB = vehicleTypeOrder.findIndex(orderType => 
+                                typeB.includes(orderType.replace(/รถบรรทุก \( | \)/g, '').replace('รถยนต์', '')) ||
+                                orderType.includes(typeB.replace(/รถบรรทุก \( | \)/g, '').replace('รถยนต์', ''))
+                            );
+                            
+                            if (indexA === -1 && indexB === -1) return 0;
+                            if (indexA === -1) return 1;
+                            if (indexB === -1) return -1;
+                            return indexA - indexB;
+                        });
+                        
+                        sortedVehicleTypes.forEach(([type, count], index) => {
+                            let icon = '🚗';
+                            if (type.includes('จักยานยนต์')) {
+                                icon = '🏍️';
+                            } else if (type.includes('ส่วนบุคคล')) {
+                                icon = '🚙';
+                            } else if (type.includes('4 ล้อ') || type.includes('4ล้อ')) {
+                                icon = '🚚';
+                            } else if (type.includes('6 ล้อ') || type.includes('6ล้อ')) {
+                                icon = '🚛';
+                            } else if (type.includes('แทรกเตอร์')) {
+                                icon = '🚜';
+                            }
+                            
+                            const card = document.createElement('div');
+                            card.className = 'vehicle-type-card';
+                            card.innerHTML = `
+                                <div class="vehicle-type-icon">${icon}</div>
+                                <div class="vehicle-type-number" id="vehicleCount${index}">0</div>
+                                <div class="vehicle-type-label">${type}</div>
+                            `;
+                            
+                            vehicleTypeStatsContainer.appendChild(card);
+                            
+                            setTimeout(() => {
+                                const countElement = document.getElementById(`vehicleCount${index}`);
+                                if (countElement) {
+                                    animateNumber(countElement, 0, count, 800);
+                                }
+                            }, 200 + (index * 150));
+                        });
+                    }
+                    
+                    const statusCounts = {
+                        overdue: 0,
+                        due: 0,
+                        urgent: 0,
+                        action: 0,
+                        safe: 0
+                    };
+                    
+                    validData.forEach(row => {
+                        const taxPeriod = cleanDateData(row[7] || '');
+                        const prbPeriod = cleanDateData(row[10] || '');
+                        const insurancePeriod = cleanDateData(row[13] || '');
+                        
+                        const status = calculateStatus(taxPeriod, prbPeriod, insurancePeriod);
+                        
+                        if (status.class === 'status-overdue') {
+                            statusCounts.overdue++;
+                        } else if (status.class === 'status-due') {
+                            statusCounts.due++;
+                        } else if (status.class === 'status-urgent') {
+                            statusCounts.urgent++;
+                        } else if (status.class === 'status-action') {
+                            statusCounts.action++;
+                        } else if (status.class === 'status-safe') {
+                            statusCounts.safe++;
+                        }
+                    });
+                    
+                    if (statusSummaryGrid) {
+                        statusSummaryGrid.innerHTML = '';
+                        
+                        const statusTypes = [
+                            {
+                                key: 'overdue',
+                                label: 'เกินกำหนดการ',
+                                class: 'overdue'
+                            },
+                            {
+                                key: 'due',
+                                label: 'ครบกำหนดการ',
+                                class: 'due'
+                            },
+                            {
+                                key: 'urgent',
+                                label: 'เร่งดำเนินการ',
+                                class: 'urgent'
+                            },
+                            {
+                                key: 'action',
+                                label: 'ระยะดำเนินการ',
+                                class: 'action'
+                            },
+                            {
+                                key: 'safe',
+                                label: 'ยังไม่ถึงกำหนดการ',
+                                class: 'safe'
+                            }
+                        ];
+                        
+                        statusTypes.forEach((statusType, index) => {
+                            const count = statusCounts[statusType.key] || 0;
+                            
+                            const card = document.createElement('div');
+                            card.className = `status-summary-card ${statusType.class}`;
+                            
+                            card.innerHTML = `
+                                <div class="status-summary-number" id="statusCount${index}">0</div>
+                                <div class="status-summary-label">${statusType.label}</div>
+                            `;
+                            
+                            statusSummaryGrid.appendChild(card);
+                            
+                            setTimeout(() => {
+                                const countElement = document.getElementById(`statusCount${index}`);
+                                if (countElement) {
+                                    animateNumber(countElement, 0, count, 800);
+                                }
+                            }, 300 + (index * 100));
+                        });
+                    }
+                } else {
+                    if (statsLoading) {
+                        statsLoading.innerHTML = `
+                            <div style="color: #e74c3c; text-align: center;">
+                                <div style="margin-bottom: 5px;">⚠️ ไม่สามารถโหลดสถิติได้</div>
+                                <div style="font-size: 0.8rem;">${response.message || 'เกิดข้อผิดพลาด'}</div>
+                            </div>
+                        `;
+                    }
+                    
+                    if (totalCarsElement) {
+                        totalCarsElement.textContent = 'ข้อผิดพลาด';
+                        totalCarsElement.style.color = '#e74c3c';
+                    }
+                }
+            });
+        }
+
+        // ฟังก์ชันสำหรับแสดงหน้าระยะเวลา
+        function showDetailedView() {
+            const dataPage = document.getElementById('dataPage');
+            const detailedPage = document.getElementById('detailedPage');
+            
+            if (dataPage) dataPage.style.display = 'none';
+            if (detailedPage) detailedPage.style.display = 'block';
+            
+            // ตรวจสอบว่ามีข้อมูลหรือไม่
+            if (!allData || allData.length === 0) {
+                console.log('ไม่มีข้อมูลสำหรับแสดงผล กำลังโหลดข้อมูลใหม่...');
+                fetchData(function(response) {
+                    if (response && response.success && response.data) {
+                        allData = response.data;
+                        displayNotificationData(allData);
+                    }
+                });
+                return;
+            }
+            
+            displayDetailedData(allData);
+        }
+
+        // ฟังก์ชันสำหรับแสดงหน้าการตรวจสภาพรถ
+        function showNotificationPage() {
+            const dataPage = document.getElementById('dataPage');
+            const notificationPage = document.getElementById('notificationPage');
+            
+            if (dataPage) dataPage.style.display = 'none';
+            if (notificationPage) notificationPage.style.display = 'block';
+            
+            // ตรวจสอบว่ามีข้อมูลหรือไม่
+            if (!allData || allData.length === 0) {
+                console.log('ไม่มีข้อมูลสำหรับแสดงผล กำลังโหลดข้อมูลใหม่...');
+                fetchData(function(response) {
+                    if (response && response.success && response.data) {
+                        allData = response.data;
+                        displayNotificationData(allData);
+                    }
+                });
+                return;
+            }
+            
+            displayNotificationData(allData);
+        }
+
+        // ฟังก์ชันสำหรับแสดงหน้าหมายเหตุ
+        function showNotesPage() {
+            const dataPage = document.getElementById('dataPage');
+            const notesPage = document.getElementById('notesPage');
+            
+            if (dataPage) dataPage.style.display = 'none';
+            if (notesPage) notesPage.style.display = 'block';
+            
+            // ตรวจสอบว่ามีข้อมูลหรือไม่
+            if (!allData || allData.length === 0) {
+                console.log('ไม่มีข้อมูลสำหรับแสดงผล กำลังโหลดข้อมูลใหม่...');
+                fetchData(function(response) {
+                    if (response && response.success && response.data) {
+                        allData = response.data;
+                        displayNotesData(allData);
+                    }
+                });
+                return;
+            }
+            
+            displayNotesData(allData);
+        }
+
+        // ฟังก์ชันย้อนกลับไปหน้าข้อมูล
+        function goBackToData() {
+            const detailedPage = document.getElementById('detailedPage');
+            const notificationPage = document.getElementById('notificationPage');
+            const notesPage = document.getElementById('notesPage');
+            const dataPage = document.getElementById('dataPage');
+            
+            if (detailedPage) detailedPage.style.display = 'none';
+            if (notificationPage) notificationPage.style.display = 'none';
+            if (notesPage) notesPage.style.display = 'none';
+            if (dataPage) dataPage.style.display = 'block';
+        }
+
+        // ฟังก์ชันแสดงข้อมูลระยะเวลา
+        function displayDetailedData(data) {
+            const tbody = document.getElementById('detailedDataBody');
+            const loadingMessage = document.getElementById('detailedLoadingMessage');
+            const tableContainer = document.getElementById('detailedTableContainer');
+            
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            if (loadingMessage) loadingMessage.style.display = 'none';
+            if (tableContainer) tableContainer.style.display = 'block';
+
+            const validData = data.filter(row => row[1] && row[1].toString().trim() !== '');
+            
+            // เติมข้อมูลใน dropdown filters
+            populateDetailedFilters(validData);
+
+            if (validData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8">ไม่พบข้อมูล</td></tr>';
+                return;
+            }
+
+            validData.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                
+                const orderCell = document.createElement('td');
+                orderCell.textContent = index + 1;
+                tr.appendChild(orderCell);
+                
+                const plateCell = document.createElement('td');
+                const vehicleType = (row[0] || '').toString();
+                let vehicleIcon = '🚗';
+                
+                if (vehicleType.includes('จักยานยนต์')) {
+                    vehicleIcon = '🏍️';
+                } else if (vehicleType.includes('ส่วนบุคคล')) {
+                    vehicleIcon = '🚙';
+                } else if (vehicleType.includes('4 ล้อ') || vehicleType.includes('4ล้อ')) {
+                    vehicleIcon = '🚚';
+                } else if (vehicleType.includes('6 ล้อ') || vehicleType.includes('6ล้อ')) {
+                    vehicleIcon = '🚛';
+                } else if (vehicleType.includes('แทรกเตอร์')) {
+                    vehicleIcon = '🚜';
+                }
+                
+                plateCell.innerHTML = `${vehicleIcon} ${cleanDateData(row[1] || '')}`;
+                tr.appendChild(plateCell);
+                
+                const responsibleCell = document.createElement('td');
+                responsibleCell.textContent = cleanDateData(row[2] || '');
+                tr.appendChild(responsibleCell);
+                
+                const branchCell = document.createElement('td');
+                branchCell.textContent = cleanDateData(row[3] || '');
+                tr.appendChild(branchCell);
+                
+                const taxPeriodCell = document.createElement('td');
+                const taxPeriod = cleanDateData(row[7] || '');
+                taxPeriodCell.textContent = taxPeriod;
+                tr.appendChild(taxPeriodCell);
+                
+                const prbPeriodCell = document.createElement('td');
+                const prbPeriod = cleanDateData(row[10] || '');
+                prbPeriodCell.textContent = prbPeriod;
+                tr.appendChild(prbPeriodCell);
+                
+                const insurancePeriodCell = document.createElement('td');
+                const insurancePeriod = cleanDateData(row[13] || '');
+                insurancePeriodCell.textContent = insurancePeriod;
+                tr.appendChild(insurancePeriodCell);
+                
+                const statusCell = document.createElement('td');
+                const status = calculateStatus(taxPeriod, prbPeriod, insurancePeriod);
+                statusCell.innerHTML = `<div class="${status.class}">${status.text}</div>`;
+                tr.appendChild(statusCell);
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ฟังก์ชันแสดงข้อมูลการตรวจสภาพรถ
+        function displayNotificationData(data) {
+            const tbody = document.getElementById('notificationDataBody');
+            const loadingMessage = document.getElementById('notificationLoadingMessage');
+            const tableContainer = document.getElementById('notificationTableContainer');
+            
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            if (loadingMessage) loadingMessage.style.display = 'none';
+            if (tableContainer) tableContainer.style.display = 'block';
+
+            const validData = data.filter(row => row[1] && row[1].toString().trim() !== '');
+            
+            // เติมข้อมูลใน dropdown filters
+            populateNotificationFilters(validData);
+
+            if (validData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">ไม่พบข้อมูล</td></tr>';
+                return;
+            }
+
+            validData.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                
+                const orderCell = document.createElement('td');
+                orderCell.textContent = index + 1;
+                tr.appendChild(orderCell);
+                
+                const plateCell = document.createElement('td');
+                const vehicleType = (row[0] || '').toString();
+                let vehicleIcon = '🚗';
+                
+                if (vehicleType.includes('จักยานยนต์')) {
+                    vehicleIcon = '🏍️';
+                } else if (vehicleType.includes('ส่วนบุคคล')) {
+                    vehicleIcon = '🚙';
+                } else if (vehicleType.includes('4 ล้อ') || vehicleType.includes('4ล้อ')) {
+                    vehicleIcon = '🚚';
+                } else if (vehicleType.includes('6 ล้อ') || vehicleType.includes('6ล้อ')) {
+                    vehicleIcon = '🚛';
+                } else if (vehicleType.includes('แทรกเตอร์')) {
+                    vehicleIcon = '🚜';
+                }
+                
+                plateCell.innerHTML = `${vehicleIcon} ${cleanDateData(row[1] || '')}`;
+                tr.appendChild(plateCell);
+                
+                const responsibleCell = document.createElement('td');
+                responsibleCell.textContent = cleanDateData(row[2] || '');
+                tr.appendChild(responsibleCell);
+                
+                const branchCell = document.createElement('td');
+                branchCell.textContent = cleanDateData(row[3] || '');
+                tr.appendChild(branchCell);
+                
+                const inspectionCell = document.createElement('td');
+                const inspectionText = cleanDateData(row[4] || '');
+                inspectionCell.textContent = inspectionText;
+                tr.appendChild(inspectionCell);
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ฟังก์ชันแสดงข้อมูลหมายเหตุ
+        function displayNotesData(data) {
+            const tbody = document.getElementById('notesDataBody');
+            const loadingMessage = document.getElementById('notesLoadingMessage');
+            const tableContainer = document.getElementById('notesTableContainer');
+            
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            if (loadingMessage) loadingMessage.style.display = 'none';
+            if (tableContainer) tableContainer.style.display = 'block';
+
+            const validData = data.filter(row => row[1] && row[1].toString().trim() !== '');
+            
+            // เติมข้อมูลใน dropdown filters
+            populateNotesFilters(validData);
+
+            if (validData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">ไม่พบข้อมูล</td></tr>';
+                return;
+            }
+
+            validData.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                
+                const orderCell = document.createElement('td');
+                orderCell.textContent = index + 1;
+                tr.appendChild(orderCell);
+                
+                const plateCell = document.createElement('td');
+                const vehicleType = (row[0] || '').toString();
+                let vehicleIcon = '🚗';
+                
+                if (vehicleType.includes('จักยานยนต์')) {
+                    vehicleIcon = '🏍️';
+                } else if (vehicleType.includes('ส่วนบุคคล')) {
+                    vehicleIcon = '🚙';
+                } else if (vehicleType.includes('4 ล้อ') || vehicleType.includes('4ล้อ')) {
+                    vehicleIcon = '🚚';
+                } else if (vehicleType.includes('6 ล้อ') || vehicleType.includes('6ล้อ')) {
+                    vehicleIcon = '🚛';
+                } else if (vehicleType.includes('แทรกเตอร์')) {
+                    vehicleIcon = '🚜';
+                }
+                
+                plateCell.innerHTML = `${vehicleIcon} ${cleanDateData(row[1] || '')}`;
+                tr.appendChild(plateCell);
+                
+                const branchCell = document.createElement('td');
+                branchCell.textContent = cleanDateData(row[3] || '');
+                tr.appendChild(branchCell);
+                
+                const notesCell = document.createElement('td');
+                notesCell.textContent = cleanDateData(row[15] || '');
+                tr.appendChild(notesCell);
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ฟังก์ชันเพิ่มเติมสำหรับ filters
+        function applyDetailedFilters() {
+            const responsibleFilter = document.getElementById('detailedResponsibleFilter');
+            const branchFilter = document.getElementById('detailedBranchFilter');
+            const statusFilter = document.getElementById('detailedStatusFilter');
+            
+            if (!responsibleFilter || !branchFilter || !statusFilter) return;
+            
+            const responsibleValue = responsibleFilter.value;
+            const branchValue = branchFilter.value;
+            const statusValue = statusFilter.value;
+            
+            let filteredData = allData || [];
+            
+            if (responsibleValue) {
+                filteredData = filteredData.filter(row => 
+                    (row[2] || '').toString().trim() === responsibleValue
+                );
+            }
+            
+            if (branchValue) {
+                filteredData = filteredData.filter(row => 
+                    (row[3] || '').toString().trim() === branchValue
+                );
+            }
+            
+            if (statusValue) {
+                filteredData = filteredData.filter(row => {
+                    const taxPeriod = cleanDateData(row[7] || '');
+                    const prbPeriod = cleanDateData(row[10] || '');
+                    const insurancePeriod = cleanDateData(row[13] || '');
+                    const status = calculateStatus(taxPeriod, prbPeriod, insurancePeriod);
+                    
+                    return status.class === `status-${statusValue}`;
+                });
+            }
+            
+            displayFilteredDetailedData(filteredData);
+        }
+
+        function displayFilteredDetailedData(data) {
+            const tbody = document.getElementById('detailedDataBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8">ไม่พบข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+                return;
+            }
+
+            data.forEach((row, index) => {
+                if (!row[1] || row[1].toString().trim() === '') return;
+                
+                const tr = document.createElement('tr');
+                
+                const orderCell = document.createElement('td');
+                orderCell.textContent = index + 1;
+                tr.appendChild(orderCell);
+                
+                const plateCell = document.createElement('td');
+                const vehicleType = (row[0] || '').toString();
+                let vehicleIcon = '🚗';
+                
+                if (vehicleType.includes('จักยานยนต์')) {
+                    vehicleIcon = '🏍️';
+                } else if (vehicleType.includes('ส่วนบุคคล')) {
+                    vehicleIcon = '🚙';
+                } else if (vehicleType.includes('4 ล้อ') || vehicleType.includes('4ล้อ')) {
+                    vehicleIcon = '🚚';
+                } else if (vehicleType.includes('6 ล้อ') || vehicleType.includes('6ล้อ')) {
+                    vehicleIcon = '🚛';
+                } else if (vehicleType.includes('แทรกเตอร์')) {
+                    vehicleIcon = '🚜';
+                }
+                
+                plateCell.innerHTML = `${vehicleIcon} ${cleanDateData(row[1] || '')}`;
+                tr.appendChild(plateCell);
+                
+                const responsibleCell = document.createElement('td');
+                responsibleCell.textContent = cleanDateData(row[2] || '');
+                tr.appendChild(responsibleCell);
+                
+                const branchCell = document.createElement('td');
+                branchCell.textContent = cleanDateData(row[3] || '');
+                tr.appendChild(branchCell);
+                
+                const taxPeriodCell = document.createElement('td');
+                const taxPeriod = cleanDateData(row[7] || '');
+                taxPeriodCell.textContent = taxPeriod;
+                tr.appendChild(taxPeriodCell);
+                
+                const prbPeriodCell = document.createElement('td');
+                const prbPeriod = cleanDateData(row[10] || '');
+                prbPeriodCell.textContent = prbPeriod;
+                tr.appendChild(prbPeriodCell);
+                
+                const insurancePeriodCell = document.createElement('td');
+                const insurancePeriod = cleanDateData(row[13] || '');
+                insurancePeriodCell.textContent = insurancePeriod;
+                tr.appendChild(insurancePeriodCell);
+                
+                const statusCell = document.createElement('td');
+                const status = calculateStatus(taxPeriod, prbPeriod, insurancePeriod);
+                statusCell.innerHTML = `<div class="${status.class}">${status.text}</div>`;
+                tr.appendChild(statusCell);
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        function clearDetailedFilters() {
+            const responsibleFilter = document.getElementById('detailedResponsibleFilter');
+            const branchFilter = document.getElementById('detailedBranchFilter');
+            const statusFilter = document.getElementById('detailedStatusFilter');
+            
+            if (responsibleFilter) responsibleFilter.value = '';
+            if (branchFilter) branchFilter.value = '';
+            if (statusFilter) statusFilter.value = '';
+            
+            displayDetailedData(allData || []);
+        }
+
+        function applyNotificationFilters() {
+            const responsibleFilter = document.getElementById('notificationResponsibleFilter');
+            const branchFilter = document.getElementById('notificationBranchFilter');
+            const inspectionFilter = document.getElementById('notificationInspectionFilter');
+            
+            if (!responsibleFilter || !branchFilter || !inspectionFilter) return;
+            
+            const responsibleValue = responsibleFilter.value;
+            const branchValue = branchFilter.value;
+            const inspectionValue = inspectionFilter.value;
+            
+            let filteredData = allData || [];
+            
+            if (responsibleValue) {
+                filteredData = filteredData.filter(row => 
+                    (row[2] || '').toString().trim() === responsibleValue
+                );
+            }
+            
+            if (branchValue) {
+                filteredData = filteredData.filter(row => 
+                    (row[3] || '').toString().trim() === branchValue
+                );
+            }
+            
+            if (inspectionValue) {
+                filteredData = filteredData.filter(row => 
+                    (row[4] || '').toString().trim() === inspectionValue
+                );
+            }
+            
+            displayFilteredNotificationData(filteredData);
+        }
+
+        function displayFilteredNotificationData(data) {
+            const tbody = document.getElementById('notificationDataBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">ไม่พบข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+                return;
+            }
+
+            data.forEach((row, index) => {
+                if (!row[1] || row[1].toString().trim() === '') return;
+                
+                const tr = document.createElement('tr');
+                
+                const orderCell = document.createElement('td');
+                orderCell.textContent = index + 1;
+                tr.appendChild(orderCell);
+                
+                const plateCell = document.createElement('td');
+                const vehicleType = (row[0] || '').toString();
+                let vehicleIcon = '🚗';
+                
+                if (vehicleType.includes('จักยานยนต์')) {
+                    vehicleIcon = '🏍️';
+                } else if (vehicleType.includes('ส่วนบุคคล')) {
+                    vehicleIcon = '🚙';
+                } else if (vehicleType.includes('4 ล้อ') || vehicleType.includes('4ล้อ')) {
+                    vehicleIcon = '🚚';
+                } else if (vehicleType.includes('6 ล้อ') || vehicleType.includes('6ล้อ')) {
+                    vehicleIcon = '🚛';
+                } else if (vehicleType.includes('แทรกเตอร์')) {
+                    vehicleIcon = '🚜';
+                }
+                
+                plateCell.innerHTML = `${vehicleIcon} ${cleanDateData(row[1] || '')}`;
+                tr.appendChild(plateCell);
+                
+                const responsibleCell = document.createElement('td');
+                responsibleCell.textContent = cleanDateData(row[2] || '');
+                tr.appendChild(responsibleCell);
+                
+                const branchCell = document.createElement('td');
+                branchCell.textContent = cleanDateData(row[3] || '');
+                tr.appendChild(branchCell);
+                
+                const inspectionCell = document.createElement('td');
+                const inspectionText = cleanDateData(row[4] || '');
+                inspectionCell.textContent = inspectionText;
+                tr.appendChild(inspectionCell);
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        function clearNotificationFilters() {
+            const responsibleFilter = document.getElementById('notificationResponsibleFilter');
+            const branchFilter = document.getElementById('notificationBranchFilter');
+            const inspectionFilter = document.getElementById('notificationInspectionFilter');
+            
+            if (responsibleFilter) responsibleFilter.value = '';
+            if (branchFilter) branchFilter.value = '';
+            if (inspectionFilter) inspectionFilter.value = '';
+            
+            displayNotificationData(allData || []);
+        }
+
+        function applyNotesFilters() {
+            const branchFilter = document.getElementById('notesBranchFilter');
+            
+            if (!branchFilter) return;
+            
+            const branchValue = branchFilter.value;
+            
+            let filteredData = allData || [];
+            
+            if (branchValue) {
+                filteredData = filteredData.filter(row => 
+                    (row[3] || '').toString().trim() === branchValue
+                );
+            }
+            
+            displayFilteredNotesData(filteredData);
+        }
+
+        function displayFilteredNotesData(data) {
+            const tbody = document.getElementById('notesDataBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">ไม่พบข้อมูลที่ตรงกับเงื่อนไข</td></tr>';
+                return;
+            }
+
+            data.forEach((row, index) => {
+                if (!row[1] || row[1].toString().trim() === '') return;
+                
+                const tr = document.createElement('tr');
+                
+                const orderCell = document.createElement('td');
+                orderCell.textContent = index + 1;
+                tr.appendChild(orderCell);
+                
+                const plateCell = document.createElement('td');
+                const vehicleType = (row[0] || '').toString();
+                let vehicleIcon = '🚗';
+                
+                if (vehicleType.includes('จักยานยนต์')) {
+                    vehicleIcon = '🏍️';
+                } else if (vehicleType.includes('ส่วนบุคคล')) {
+                    vehicleIcon = '🚙';
+                } else if (vehicleType.includes('4 ล้อ') || vehicleType.includes('4ล้อ')) {
+                    vehicleIcon = '🚚';
+                } else if (vehicleType.includes('6 ล้อ') || vehicleType.includes('6ล้อ')) {
+                    vehicleIcon = '🚛';
+                } else if (vehicleType.includes('แทรกเตอร์')) {
+                    vehicleIcon = '🚜';
+                }
+                
+                plateCell.innerHTML = `${vehicleIcon} ${cleanDateData(row[1] || '')}`;
+                tr.appendChild(plateCell);
+                
+                const branchCell = document.createElement('td');
+                branchCell.textContent = cleanDateData(row[3] || '');
+                tr.appendChild(branchCell);
+                
+                const notesCell = document.createElement('td');
+                notesCell.textContent = cleanDateData(row[15] || '');
+                tr.appendChild(notesCell);
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        function clearNotesFilters() {
+            const branchFilter = document.getElementById('notesBranchFilter');
+            
+            if (branchFilter) branchFilter.value = '';
+            
+            displayNotesData(allData || []);
+        }
+
+        function refreshDetailedData() {
+            displayDetailedData(allData || []);
+        }
+
+        function refreshNotificationData() {
+            displayNotificationData(allData || []);
+        }
+
+        function refreshNotesData() {
+            displayNotesData(allData || []);
+        }
+
+        // เริ่มต้นโหลดสถิติเมื่อหน้าเว็บโหลดเสร็จ
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAndDisplayStats();
+            
+            // เพิ่ม event listener สำหรับ Enter key ในช่องค้นหา
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchData();
+                    }
+                });
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'991097192243fd22',t:'MTc2MDg4MDIwOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
